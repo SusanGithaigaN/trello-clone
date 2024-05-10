@@ -49,10 +49,10 @@ export const useBoardStore = defineStore('boardStore', () => {
 
     // Move task
     // split task & return the 1st item of the array
-    function moveTask({ taskIndex, fromTaskIndex, fromColumnIndex, toColumnIndex }) {
-        const task = board.value.columns[fromColumnIndex].tasks.splice(taskIndex, 1)[0]
+    function moveTask({ fromTaskIndex, toTaskIndex, fromColumnIndex, toColumnIndex }) {
+        const task = board.value.columns[fromColumnIndex].tasks.splice(fromTaskIndex, 1)[0]
 
-        board.value.columns[toColumnIndex].tasks.push(task)
+        board.value.columns[toColumnIndex].tasks.splice(toTaskIndex, 0, task)
                 // console.log({ taskIndex, fromTaskIndex, fromColumnIndex, toColumnIndex})
     }
 

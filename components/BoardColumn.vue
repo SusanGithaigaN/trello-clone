@@ -35,7 +35,7 @@ function deleteColumn(columnIndex) {
 }
 
 // drop task
-function dropItem(event, toColumnIndex) {
+function dropItem(event, { toColumnIndex, toTaskIndex}) {
   const type = event.dataTransfer.getData("type");
   const fromColumnIndex = event.dataTransfer.getData("from-column-index");
 
@@ -44,7 +44,10 @@ function dropItem(event, toColumnIndex) {
     // console.log({ fromTaskIndex, fromColumnIndex})
 
     boardStore.moveTask({
-      taskIndex: fromTaskIndex,
+      // taskIndex: fromTaskIndex,
+      // expand on the move task functionality
+      fromTaskIndex,
+      toTaskIndex,
       fromColumnIndex,
       toColumnIndex,
     });
@@ -88,7 +91,7 @@ on yourself, trigger this event
     @dragstart.self="pickupColumn($event, columnIndex)"
     @dragenter.prevent
     @dragover.prevent
-    @drop.stop="dropItem($event, columnIndex)"
+    @drop.stop="dropItem($event, { toColumnIndex: columnIndex })"
   >
     <div class="column-header mb-4">
       <div>
@@ -121,6 +124,9 @@ on yourself, trigger this event
               fromTaskIndex: taskIndex,
               fromColumnIndex: columnIndex,
             })
+          "
+          @drop.stop="
+            dropItem($event, { toColumnIndex: columnIndex, toTaskIndex: taskIndex })
           "
         >
           <strong> {{ task.name }}</strong>
