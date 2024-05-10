@@ -35,36 +35,60 @@ function deleteColumn(columnIndex) {
 }
 
 // drop task
-function dropTask(event, toColumnIndex) {
-  const fromColumnIndex = event.dataTransfer.getData('from-column-index')
-  const fromTaskIndex = event.dataTransfer.getData('from-task-index')
-  // console.log({ fromTaskIndex, fromColumnIndex})
+function dropItem(event, toColumnIndex) {
+  const type = event.dataTransfer.getData("type");
+  const fromColumnIndex = event.dataTransfer.getData("from-column-index");
 
-  boardStore.moveTask({
-    taskIndex: fromTaskIndex,
-    fromColumnIndex,
-    toColumnIndex
-  })
+  if (type === "task") {
+    const fromTaskIndex = event.dataTransfer.getData("from-task-index");
+    // console.log({ fromTaskIndex, fromColumnIndex})
+
+    boardStore.moveTask({
+      taskIndex: fromTaskIndex,
+      fromColumnIndex,
+      toColumnIndex,
+    });
+    // avoid random cases
+  } else if (type === "column") {
+    boardStore.moveColumn({
+      // define where the column is coming from & moving to
+      fromColumnIndex,
+      toColumnIndex,
+    });
+  }
 }
 
 function goToTask(taskId) {
   router.push(`/tasks/${taskId}`);
 }
 
+function pickupColumn(event, fromColumnIndex) {
+  // give the column permission to move
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.dropEffect = "move";
+  event.dataTransfer.setData("type", "column");
+  event.dataTransfer.setData("from-column-index", fromColumnIndex);
+}
+
 function pickupTask(event, { fromColumnIndex, fromTaskIndex }) {
   event.dataTransfer.effectAllowed = "move";
   event.dataTransfer.dropEffect = "move";
-  event.dataTransfer.setData('from-column-index', fromColumnIndex)
-  event.dataTransfer.setData('from-task-index', fromTaskIndex)
+  // differentiate drop task and pickup task
+  event.dataTransfer.setData("type", "task");
+  event.dataTransfer.setData("from-column-index", fromColumnIndex);
+  event.dataTransfer.setData("from-task-index", fromTaskIndex);
 }
 </script>
-
+// draggable="true": make the component draggable // @dragstart.self: only when you click
+on yourself, trigger this event
 <template>
   <UContainer
     class="column"
+    draggable="true"
+    @dragstart.self="pickupColumn($event, columnIndex)"
     @dragenter.prevent
     @dragover.prevent
-    @drop.stop="dropTask($event, columnIndex)"
+    @drop.stop="dropItem($event, columnIndex)"
   >
     <div class="column-header mb-4">
       <div>
@@ -92,10 +116,12 @@ function pickupTask(event, { fromColumnIndex, fromTaskIndex }) {
           class="mb-4"
           @click="goToTask(task.id)"
           draggable="true"
-          @dragstart="pickupTask($event, {
-            fromTaskIndex: taskIndex,
-            fromColumnIndex: columnIndex
-          })"
+          @dragstart="
+            pickupTask($event, {
+              fromTaskIndex: taskIndex,
+              fromColumnIndex: columnIndex,
+            })
+          "
         >
           <strong> {{ task.name }}</strong>
           <p>{{ task.description }}</p>
