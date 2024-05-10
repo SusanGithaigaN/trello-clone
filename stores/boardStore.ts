@@ -33,18 +33,27 @@ export const useBoardStore = defineStore('boardStore', () => {
     }
 
     // DELETE task
-    function deleteTask(taskId){
-       for (const column of board.value.columns) {
-        // find the index of the task
-        const taskIndex = column.tasks.findIndex(task => task.id === taskId)
+    function deleteTask(taskId) {
+        for (const column of board.value.columns) {
+            // find the index of the task
+            const taskIndex = column.tasks.findIndex(task => task.id === taskId)
 
-        // if we find something that doesn't exist in the column
-        if (taskIndex !== -1) {
-            columns.tasks.splice(taskIndex, 1)
-            // end loop
-            return
+            // if we find something that doesn't exist in the column
+            if (taskIndex !== -1) {
+                column.tasks.splice(taskIndex, 1)
+                // end loop
+                return
+            }
         }
-       }
+    }
+
+    // Move task
+    // split task & return the 1st item of the array
+    function moveTask({ taskIndex, fromTaskIndex, fromColumnIndex, toColumnIndex }) {
+        const task = board.value.columns[fromColumnIndex].tasks.splice(taskIndex, 1)[0]
+
+        board.value.columns[toColumnIndex].tasks.push(task)
+                // console.log({ taskIndex, fromTaskIndex, fromColumnIndex, toColumnIndex})
     }
 
     // Columns
@@ -73,6 +82,7 @@ export const useBoardStore = defineStore('boardStore', () => {
         addTask,
         addColumn,
         deleteColumn,
-        deleteTask
+        deleteTask,
+        moveTask
     }
 })
