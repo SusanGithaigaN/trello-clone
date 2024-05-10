@@ -1,4 +1,6 @@
 <script setup>
+import { routerKey } from 'vue-router';
+
 defineProps({
   column: {
     type: Object,
@@ -10,14 +12,18 @@ defineProps({
   },
 });
 
-const boardStore = useBoardStore();
-
+const boardStore = useBoardStore()
+const router = useRouter()
 // variable for name edit status
-const editNameState = ref(false);
+const editNameState = ref(false)
 
 // delete column by index
 function deleteColumn(columnIndex) {
   boardStore.deleteColumn(columnIndex);
+}
+
+function goToTask(taskId){
+  router.push(`/tasks/${taskId}`)
 }
 </script>
 
@@ -45,7 +51,7 @@ function deleteColumn(columnIndex) {
     </div>
     <ul>
       <li v-for="task in column.tasks" :key="task.id">
-        <UCard class="mb-4">
+        <UCard class="mb-4" @click="goToTask(task.id)">
           <strong> {{ task.name }}</strong>
           <p>{{ task.description }}</p>
         </UCard>

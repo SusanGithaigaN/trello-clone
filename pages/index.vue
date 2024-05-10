@@ -2,6 +2,14 @@
 import { useBoardStore } from "../stores/boardStore";
 
 const boardStore = useBoardStore();
+const route = useRoute();
+const router = useRouter();
+
+// track whether the modal isOpen
+const isModalOpen = computed(() => {
+  // track the path
+  return route.name === "index-tasks-id";
+});
 
 // track the column name & give it a type
 const newColumnName = ref("");
@@ -11,6 +19,11 @@ function addColumn() {
   boardStore.addColumn(newColumnName.value);
   // reset column input back to it's blank state
   newColumnName.value = "";
+}
+
+// close modal
+function closeModal() {
+  router.push('/')
 }
 </script>
 
@@ -24,35 +37,6 @@ function addColumn() {
         :column="column"
         :columnIndex="columnIndex"
       >
-        <!-- track whether the name is being edited or deleted -->
-        <!-- add event listener -->
-        <!-- Delete later since we are looping through the board column and rendering it-->
-        <!-- <div class="column-header mb-4">
-          <div>
-            <UInput v-if="editNameState" type="text" v-model="column.name" />
-            <h2 v-else class="">{{ column.name }}</h2>
-          </div>
-          <div>
-            <UButton
-              icon="i-heroicons-pencil-square"
-              class="mr-2"
-              @click="editNameState = !editNameState"
-            />
-            <UButton
-              icon="i-heroicons-trash"
-              color="red"
-              @click="deleteColumn(columnIndex)"
-            />
-          </div>
-        </div>
-        <ul>
-          <li v-for="task in column.tasks" :key="task.id">
-            <UCard class="mb-4">
-              <strong> {{ task.name }}</strong>
-              <p>{{ task.description }}</p>
-            </UCard>
-          </li>
-        </ul> -->
       </BoardColumn>
       <!-- create a container and an input field from Nuxt UI -->
       <!-- i-icon-library -->
@@ -68,5 +52,11 @@ function addColumn() {
         />
       </UContainer>
     </main>
+    <!-- create a task modal -->
+    <!-- open & close modal -->
+    <div v-show="isModalOpen" class="task-bg" @click.self="closeModal">
+      <!-- create a child routed view -->
+      <NuxtPage :key="route.fullPath" />
+    </div>
   </div>
 </template>
