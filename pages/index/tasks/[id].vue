@@ -7,6 +7,8 @@ import { useBoardStore } from "~/stores/boardStore"
 const boardStore = useBoardStore()
 const route = useRoute()
 const router = useRouter()
+// notify users when a task has been  deleted
+const toast = useToast()
 
 const task = computed(() => {
   return boardStore.getTask(route.params.id)
@@ -14,6 +16,12 @@ const task = computed(() => {
 
 // delete task
 function deleteTask() {
+  toast.add({
+    title: 'Task Deleted',
+    description: `${task.value.name} has been deleted`,
+    icon: 'i-heroicons-trash',
+    color: 'red'
+  })
   boardStore.deleteTask(route.params.id)
   router.push("/")
 }
